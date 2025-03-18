@@ -12,13 +12,12 @@ import Login from "./pages/Login/Login";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import useFetch from "./hooks/useFetch";
 import { ServerName } from "./types/ServerName";
+import Forge from "./pages/Forge/Forge";
 
 function AppContent() {
   const { data } = useFetch<ServerName>("/name");
   const [selectedMenu, setSelectedMenu] = useState("Home");
   const { isAuthenticated } = useAuth();
-
-  console.log(isAuthenticated);
 
   // Redirect to login if not authenticated
   if (!isAuthenticated) {
@@ -36,9 +35,7 @@ function AppContent() {
       case "Team" === selectedMenu:
         return <p className="text-center">Manage users</p>;
       case "Forge" === selectedMenu:
-        return (
-          <p className="text-center">Compile and Extract .alghive files</p>
-        );
+        return <Forge />;
       case "Settings" === selectedMenu:
         return <p className="text-center">Access Settings</p>;
     }

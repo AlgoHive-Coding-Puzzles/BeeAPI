@@ -182,7 +182,10 @@ export default function HomePage({ setSelectedMenu }: HomeProps) {
           {themes
             ?.sort((a, b) => a.name.localeCompare(b.name))
             .map((theme) => (
-              <div className="card flex justify-content-center">
+              <div
+                className="card flex justify-content-center"
+                key={theme.name}
+              >
                 <Card
                   key={theme.name}
                   title={"Folder " + theme.name}

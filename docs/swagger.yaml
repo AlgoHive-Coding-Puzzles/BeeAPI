@@ -1,24 +1,5 @@
 basePath: /
 definitions:
-  models.LoginRequest:
-    properties:
-      password:
-        type: string
-      username:
-        type: string
-    required:
-    - password
-    - username
-    type: object
-  models.LoginResponse:
-    properties:
-      message:
-        type: string
-      token:
-        type: string
-      username:
-        type: string
-    type: object
   models.PuzzleResponse:
     properties:
       author:
@@ -44,16 +25,6 @@ definitions:
       updatedAt:
         type: string
     type: object
-  models.RegisterRequest:
-    properties:
-      password:
-        type: string
-      username:
-        type: string
-    required:
-    - password
-    - username
-    type: object
   models.ThemeResponse:
     properties:
       enigmes_count:
@@ -67,13 +38,6 @@ definitions:
       size:
         type: integer
     type: object
-  models.UserResponse:
-    properties:
-      createdAt:
-        type: string
-      username:
-        type: string
-    type: object
 host: localhost:5000
 info:
   contact:
@@ -86,160 +50,6 @@ info:
   title: BeeAPI Go
   version: "1.0"
 paths:
-  /auth/check:
-    get:
-      description: Checks if the provided token is valid
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: boolean
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      security:
-      - Bearer: []
-      summary: Check authentication
-      tags:
-      - Auth
-  /auth/delete-account:
-    delete:
-      description: Deletes the authenticated user's account
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      security:
-      - Bearer: []
-      summary: Delete user account
-      tags:
-      - Auth
-  /auth/login:
-    post:
-      consumes:
-      - application/json
-      description: Authenticates a user and returns a JWT token
-      parameters:
-      - description: Login credentials
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/models.LoginRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.LoginResponse'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: User login
-      tags:
-      - Auth
-  /auth/logout:
-    post:
-      description: Logs out a user by invalidating their token
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      security:
-      - Bearer: []
-      summary: User logout
-      tags:
-      - Auth
-  /auth/register:
-    post:
-      consumes:
-      - application/json
-      description: Registers a new user
-      parameters:
-      - description: Registration details
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/models.RegisterRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: User registration
-      tags:
-      - Auth
-  /auth/user:
-    get:
-      description: Returns information about the authenticated user
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.UserResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      security:
-      - Bearer: []
-      summary: Get user information
-      tags:
-      - Auth
   /name:
     get:
       description: Returns the name of the server

@@ -3,8 +3,8 @@ from flask import Flask, send_from_directory
 from flasgger import Swagger
 from .utils.loader import PuzzlesLoader
 
-app = Flask(__name__, static_folder='../frontend/dist')
-app.secret_key = 'your_secret_key_here'  # Add a secret key for sessions
+app = Flask(__name__)
+app.secret_key = 'your_secret_key_here'
 
 loader = PuzzlesLoader()
 
@@ -30,4 +30,4 @@ def serve(path):
     else:
         return send_from_directory(app.static_folder, 'index.html')
 
-from .routes import health, puzzles, themes, auth
+from .routes import health, puzzles, themes

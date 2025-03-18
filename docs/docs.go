@@ -22,6 +22,34 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/apikey": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Returns the current API key",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "API Key"
+                ],
+                "summary": "Check API key",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/name": {
             "get": {
                 "description": "Returns the name of the server",
@@ -647,7 +675,7 @@ const docTemplate = `{
         "Bearer": {
             "type": "apiKey",
             "name": "Authorization",
-            "in": "header"
+            "in": "Bearer"
         }
     }
 }`

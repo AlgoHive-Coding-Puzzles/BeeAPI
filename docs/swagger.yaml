@@ -50,6 +50,23 @@ info:
   title: BeeAPI Go
   version: "1.0"
 paths:
+  /apikey:
+    get:
+      description: Returns the current API key
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Check API key
+      tags:
+      - API Key
   /name:
     get:
       description: Returns the name of the server
@@ -417,7 +434,7 @@ paths:
       - Themes
 securityDefinitions:
   Bearer:
-    in: header
+    in: Bearer
     name: Authorization
     type: apiKey
 swagger: "2.0"

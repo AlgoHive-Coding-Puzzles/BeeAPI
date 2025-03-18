@@ -31,7 +31,7 @@ import (
 // @host localhost:5000
 // @BasePath /
 // @securityDefinitions.apikey Bearer
-// @in header
+// @in Bearer
 // @name Authorization
 func main() {
 	// Load environment variables from .env file if it exists
@@ -87,6 +87,9 @@ func main() {
 	protected := router.Group("")
 	protected.Use(middlewares.RequireAPIKey(apiKeyManager))
 	{
+		// Check API key
+		protected.GET("/apikey", controllers.CheckApiKey)
+
 		// Theme management
 		protected.POST("/theme", themeController.CreateTheme)
 		protected.DELETE("/theme", themeController.DeleteTheme)

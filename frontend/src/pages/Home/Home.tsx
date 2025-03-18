@@ -6,6 +6,7 @@ import { InputText } from "primereact/inputtext";
 import { Dialog } from "primereact/dialog";
 import { useEffect, useState } from "react";
 import { convertBytes } from "../../utils/utils";
+import AuthService from "../../services/AuthService";
 
 interface HomeProps {
   setSelectedMenu: (menu: string) => void;
@@ -43,8 +44,13 @@ export default function HomePage({ setSelectedMenu }: HomeProps) {
   };
 
   const handleDeleteTheme = (theme: Theme) => {
+    const token = AuthService.getToken();
     fetch(`/theme?name=${theme.name}`, {
       method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
     }).then((res) => {
       if (res.ok) {
         setSuccessMsg("Theme deleted successfully");
@@ -61,9 +67,11 @@ export default function HomePage({ setSelectedMenu }: HomeProps) {
   };
 
   const handleCreateTheme = () => {
+    const token = AuthService.getToken();
     fetch(`/theme?name=${newThemeName}`, {
       method: "POST",
       headers: {
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
     }).then((res) => {

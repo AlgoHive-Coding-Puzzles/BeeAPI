@@ -7,6 +7,7 @@ import { convertBytes } from "../../utils/utils";
 import { Puzzle } from "../../types/Puzzle";
 import FileUploadComponent from "../../components/FileUpload/FileUpload";
 import { Toast } from "primereact/toast";
+import AuthService from "../../services/AuthService";
 
 interface ThemeProps {
   selectedMenu: string;
@@ -35,8 +36,13 @@ export default function ThemePage({ selectedMenu }: ThemeProps) {
   }, [selectedTheme, refreshTheme]);
 
   const handleDeletePuzzle = (puzzle: Puzzle) => {
+    const token = AuthService.getToken();
     fetch(`/puzzle?theme=${selectedTheme}&puzzle=${puzzle.name}`, {
       method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
     }).then((res) => {
       if (res.ok) {
         setTheme((prevTheme) => {

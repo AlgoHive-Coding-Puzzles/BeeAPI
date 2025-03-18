@@ -13,6 +13,7 @@ import { Button } from "primereact/button";
 import { Tooltip } from "primereact/tooltip";
 import { Tag } from "primereact/tag";
 import "./FileUpload.css";
+import AuthService from "../../services/AuthService";
 
 interface FileUploadProps {
   theme: string;
@@ -89,9 +90,13 @@ export default function FileUploadComponent({
           }
           const fileFormData = new FormData();
           fileFormData.append("file", file, file.name);
+          const token = AuthService.getToken();
           return fetch(`/puzzle/upload?theme=${theme}`, {
             method: "POST",
             body: fileFormData,
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           });
         })
       );
@@ -100,6 +105,9 @@ export default function FileUploadComponent({
 
       fetch("/theme/reload", {
         method: "POST",
+        headers: {
+          Authorization: `Bearer ${AuthService.getToken()}`,
+        },
       }).then((res) => {
         if (res.ok) {
           setRefresh(true);

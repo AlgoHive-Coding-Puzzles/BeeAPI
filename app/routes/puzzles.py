@@ -1,6 +1,7 @@
 from flask import jsonify, request, abort
 from .. import app, loader
 from ..utils.utils import get_puzzle_info
+from ..auth import login_required
 
 @app.route('/puzzles', methods=['GET'])
 def puzzles():
@@ -115,6 +116,7 @@ def run():
     return jsonify({'message': 'Theme or puzzle not found'})
   
 @app.route('/puzzle/upload', methods=['POST'])
+@login_required
 def upload_puzzle():
     """
     Upload puzzle
@@ -154,6 +156,7 @@ def upload_puzzle():
     return jsonify({'message': 'Puzzle uploaded'})
   
 @app.route('/puzzle', methods=['DELETE'])
+@login_required
 def delete_puzzle():
     """
     Delete puzzle

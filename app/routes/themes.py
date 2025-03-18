@@ -60,6 +60,7 @@ def theme():
   
 # Create theme
 @app.route('/theme', methods=['POST'])
+@login_required
 def create_theme():
     """
     Create a theme
@@ -82,6 +83,7 @@ def create_theme():
   
 # Delete theme
 @app.route('/theme', methods=['DELETE'])
+@login_required
 def delete_theme():
     """
     Delete a theme
@@ -105,6 +107,7 @@ def delete_theme():
     return jsonify({'message': 'Theme deleted'})
 
 @app.route('/theme/reload', methods=['POST'])
+@login_required
 def reload():
     """
     Reload the puzzles

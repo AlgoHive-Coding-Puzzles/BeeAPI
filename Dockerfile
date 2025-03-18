@@ -1,15 +1,4 @@
-# Étape 1: Build the React app
-FROM node:20-alpine AS build
-
-WORKDIR /app/frontend
-
-COPY frontend/package*.json ./
-RUN npm install
-
-COPY frontend/ ./
-RUN npm run build
-
-# Étape 2 : Build the Python server
+# Étape 1 : Build the Python server
 FROM python:3.10-alpine
 
 WORKDIR /app

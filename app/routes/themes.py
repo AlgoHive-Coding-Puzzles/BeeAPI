@@ -8,7 +8,6 @@ last_reload_time = {}
 COOLDOWN_PERIOD = 10 # 10 seconds
 
 @app.route('/themes', methods=['GET'])
-@login_required
 def themes():
     """
     Get the list of themes
@@ -23,7 +22,6 @@ def themes():
     return jsonify(loaded_themes)
   
 @app.route('/themes/names', methods=['GET'])
-@login_required
 def themes_names():
     """
     Get the list of themes names
@@ -38,7 +36,6 @@ def themes_names():
     return jsonify(loaded_themes)
   
 @app.route('/theme', methods=['GET'])
-@login_required
 def theme():
     """
     Get a theme
@@ -63,7 +60,6 @@ def theme():
   
 # Create theme
 @app.route('/theme', methods=['POST'])
-@login_required
 def create_theme():
     """
     Create a theme
@@ -86,7 +82,6 @@ def create_theme():
   
 # Delete theme
 @app.route('/theme', methods=['DELETE'])
-@login_required
 def delete_theme():
     """
     Delete a theme
@@ -110,7 +105,6 @@ def delete_theme():
     return jsonify({'message': 'Theme deleted'})
 
 @app.route('/theme/reload', methods=['POST'])
-@login_required
 def reload():
     """
     Reload the puzzles

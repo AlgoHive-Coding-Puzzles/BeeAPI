@@ -1,0 +1,613 @@
+basePath: /
+definitions:
+  models.LoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  models.LoginResponse:
+    properties:
+      message:
+        type: string
+      token:
+        type: string
+      username:
+        type: string
+    type: object
+  models.PuzzleResponse:
+    properties:
+      author:
+        type: string
+      cipher:
+        type: string
+      compressedSize:
+        type: integer
+      createdAt:
+        type: string
+      difficulty:
+        type: string
+      id:
+        type: string
+      language:
+        type: string
+      name:
+        type: string
+      obscure:
+        type: string
+      uncompressedSize:
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  models.RegisterRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  models.ThemeResponse:
+    properties:
+      enigmes_count:
+        type: integer
+      name:
+        type: string
+      puzzles:
+        items:
+          $ref: '#/definitions/models.PuzzleResponse'
+        type: array
+      size:
+        type: integer
+    type: object
+  models.UserResponse:
+    properties:
+      createdAt:
+        type: string
+      username:
+        type: string
+    type: object
+host: localhost:5000
+info:
+  contact:
+    email: ericphlpp@proton.me
+    name: API Support
+  description: API server for AlgoHive puzzles
+  license:
+    name: MIT
+    url: https://github.com/AlgoHive-Coding-Puzzles/BeeAPI/blob/main/LICENSE
+  title: BeeAPI Go
+  version: "1.0"
+paths:
+  /auth/check:
+    get:
+      description: Checks if the provided token is valid
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Check authentication
+      tags:
+      - Auth
+  /auth/delete-account:
+    delete:
+      description: Deletes the authenticated user's account
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Delete user account
+      tags:
+      - Auth
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates a user and returns a JWT token
+      parameters:
+      - description: Login credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: User login
+      tags:
+      - Auth
+  /auth/logout:
+    post:
+      description: Logs out a user by invalidating their token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: User logout
+      tags:
+      - Auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Registers a new user
+      parameters:
+      - description: Registration details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: User registration
+      tags:
+      - Auth
+  /auth/user:
+    get:
+      description: Returns information about the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.UserResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get user information
+      tags:
+      - Auth
+  /name:
+    get:
+      description: Returns the name of the server
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get server name
+      tags:
+      - App
+  /ping:
+    get:
+      description: Returns a pong response to check if the API is alive
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Health check endpoint
+      tags:
+      - App
+  /puzzle:
+    delete:
+      description: Deletes a puzzle from a theme
+      parameters:
+      - description: Theme name
+        in: query
+        name: theme
+        required: true
+        type: string
+      - description: Puzzle name
+        in: query
+        name: puzzle
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Delete a puzzle
+      tags:
+      - Puzzles
+    get:
+      description: Returns details about a specific puzzle
+      parameters:
+      - description: Theme name
+        in: query
+        name: theme
+        required: true
+        type: string
+      - description: Puzzle name
+        in: query
+        name: puzzle
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.PuzzleResponse'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get puzzle details
+      tags:
+      - Puzzles
+  /puzzle/generate:
+    get:
+      description: Generates puzzle input and calculates solutions for a given puzzle
+      parameters:
+      - description: Theme name
+        in: query
+        name: theme
+        required: true
+        type: string
+      - description: Puzzle name
+        in: query
+        name: puzzle
+        required: true
+        type: string
+      - description: Unique ID for generation
+        in: query
+        name: unique_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Generate puzzle input and solutions
+      tags:
+      - Puzzles
+  /puzzle/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Uploads a new puzzle to a theme
+      parameters:
+      - description: Theme name
+        in: query
+        name: theme
+        required: true
+        type: string
+      - description: Puzzle file (.alghive)
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Upload a puzzle
+      tags:
+      - Puzzles
+  /puzzles:
+    get:
+      description: Returns all puzzles for a specific theme
+      parameters:
+      - description: Theme name
+        in: query
+        name: theme
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.PuzzleResponse'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get puzzles for a theme
+      tags:
+      - Puzzles
+  /puzzles/names:
+    get:
+      description: Returns names of all puzzles for a specific theme
+      parameters:
+      - description: Theme name
+        in: query
+        name: theme
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get puzzle names
+      tags:
+      - Puzzles
+  /theme:
+    delete:
+      description: Deletes a theme with the given name
+      parameters:
+      - description: Theme name
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Delete a theme
+      tags:
+      - Themes
+    get:
+      description: Returns details of a specific theme by name
+      parameters:
+      - description: Theme name
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ThemeResponse'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a specific theme
+      tags:
+      - Themes
+    post:
+      description: Creates a new theme with the given name
+      parameters:
+      - description: Theme name
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Create a new theme
+      tags:
+      - Themes
+  /theme/reload:
+    post:
+      description: Reloads all themes and puzzles
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "429":
+          description: Too Many Requests
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Reload themes
+      tags:
+      - Themes
+  /themes:
+    get:
+      description: Returns a list of all available themes
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.ThemeResponse'
+            type: array
+      summary: Get all themes
+      tags:
+      - Themes
+  /themes/names:
+    get:
+      description: Returns a list of theme names
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Get theme names
+      tags:
+      - Themes
+securityDefinitions:
+  Bearer:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

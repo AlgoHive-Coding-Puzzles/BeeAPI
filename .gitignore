@@ -1,7 +1,31 @@
-#
-# BeeAPI - Server
-#
-puzzles/*
-!puzzles/sample
-__pycache__/
+# Go specific
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+
+# Binaries
+/beeapi
+
+# Dependency directories
+/vendor/
+/go.sum
+
+# Application specific
+/puzzles/*
+!/puzzles/sample
 .env
+
+# IDE specific
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Build directories
+/bin/
+/dist/

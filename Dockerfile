@@ -23,14 +23,11 @@ COPY --from=builder /app/beeapi /app/beeapi
 # Create puzzles directory
 RUN mkdir -p /app/puzzles && chmod -R 777 /app/puzzles
 
-# Copy static files
-COPY --from=builder /app/public /app/public
-
 # Environment variables
 ENV SERVER_NAME="Local"
 ENV SERVER_DESCRIPTION="Local Dev Server"
 ENV PYTHON_PATH="python"
 
-EXPOSE 8080
+EXPOSE 5000
 
 CMD ["/app/beeapi"]

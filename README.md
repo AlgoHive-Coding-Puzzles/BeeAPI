@@ -56,8 +56,31 @@ docker build -t beeapi-go .
 Then, run the Docker container:
 
 ```bash
-docker run -d -p 8080:8080 --name beeapi-go -v $(pwd)/puzzles:/app/puzzles beeapi-go
+docker run -d -p 8080:8080 --name beeapi-go -v $(pwd)/puzzles:/app/puzzles -v $(pwd)/data:/app/data beeapi-go
 ```
+
+## API Authentication
+
+BeeAPI Go uses API key authentication for protected endpoints (POST, PUT, DELETE). When the server starts for the first time, it generates a unique API key and saves it in a `.api-key` file in the root directory.
+
+To authenticate your requests to protected endpoints:
+
+1. Look for the API key in the `.api-key` file or in the server logs when it starts
+2. Include the API key in your requests' Authorization header:
+
+```bash
+curl -X POST "http://localhost:5000/theme" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -d "name=new-theme"
+```
+
+If you're using Docker, you can access the API key by:
+
+```bash
+docker exec beeapi-go cat /app/.api-key
+```
+
+Make sure to keep this key secure as it provides administrative access to your BeeAPI instance.
 
 ## API Documentation
 

@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/algohive/beeapi/controllers"
+	"github.com/algohive/beeapi/middlewares"
 	"github.com/algohive/beeapi/services"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -35,6 +36,13 @@ import (
 func main() {
 	// Load environment variables from .env file if it exists
 	_ = godotenv.Load()
+
+	// Initialize API key manager
+	apiKeyManager, err := services.NewAPIKeyManager(".")
+	if err != nil {
+		log.Fatalf("Failed to initialize API key manager: %v", err)
+	}
+	log.Printf("API key initialized: %s", apiKeyManager.GetAPIKey())
 
 	// Create services
 	puzzlesLoader := services.NewPuzzlesLoader()
@@ -75,10 +83,10 @@ func main() {
 	router.GET("/puzzle", puzzleController.GetPuzzle)
 	router.GET("/puzzle/generate", puzzleController.GeneratePuzzle)
 	
-	// Protected routes
+	// Protected routes with API key authentication
 	protected := router.Group("")
-	// protected.Use(middleware.RequireAuth(authService))
-	// {
+	protected.Use(middlewares.RequireAPIKey(apiKeyManager))
+	{
 		// Theme management
 		protected.POST("/theme", themeController.CreateTheme)
 		protected.DELETE("/theme", themeController.DeleteTheme)
@@ -87,7 +95,7 @@ func main() {
 		// Puzzle management
 		protected.POST("/puzzle/upload", puzzleController.UploadPuzzle)
 		protected.DELETE("/puzzle", puzzleController.DeletePuzzle)
-	// }
+	}
 
 	
 	// Make sure puzzles directory exists
@@ -119,6 +127,7 @@ func main() {
 	// Run server in a goroutine so it doesn't block
 	go func() {
 		log.Printf("Server starting on port %s", port)
+		log.Printf("API Key: %s", apiKeyManager.GetAPIKey())
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Server error: %v", err)
 		}

@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/algohive/beeapi/controllers"
-	"github.com/algohive/beeapi/middleware"
 	"github.com/algohive/beeapi/services"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -38,18 +37,13 @@ func main() {
 	_ = godotenv.Load()
 
 	// Create services
-	authService := services.NewAuthService()
 	puzzlesLoader := services.NewPuzzlesLoader()
 	pythonRunner := services.NewPythonRunner(os.Getenv("PYTHON_PATH")) // Get from env or use default
-
-	// Load users from environment variables
-	authService.LoadUsersFromEnv()
 
 	// Create controllers
 	healthController := controllers.NewHealthController()
 	themeController := controllers.NewThemeController(puzzlesLoader)
 	puzzleController := controllers.NewPuzzleController(puzzlesLoader, pythonRunner)
-	authController := controllers.NewAuthController(authService)
 
 	// Create router
 	gin.SetMode(gin.ReleaseMode)
@@ -80,29 +74,11 @@ func main() {
 	router.GET("/puzzles/names", puzzleController.GetPuzzleNames)
 	router.GET("/puzzle", puzzleController.GetPuzzle)
 	router.GET("/puzzle/generate", puzzleController.GeneratePuzzle)
-
-	// Auth routes
-	auth := router.Group("/auth")
-	{
-		// Public auth endpoints
-		auth.POST("/login", authController.Login)
-		auth.POST("/register", authController.Register)
-		
-		// Protected auth endpoints
-		authProtected := auth.Group("")
-		authProtected.Use(middleware.RequireAuth(authService))
-		{
-			authProtected.POST("/logout", authController.Logout)
-			authProtected.DELETE("/delete-account", authController.DeleteAccount)
-			authProtected.GET("/user", authController.GetUser)
-			authProtected.GET("/check", authController.CheckAuth)
-		}
-	}
 	
 	// Protected routes
 	protected := router.Group("")
-	protected.Use(middleware.RequireAuth(authService))
-	{
+	// protected.Use(middleware.RequireAuth(authService))
+	// {
 		// Theme management
 		protected.POST("/theme", themeController.CreateTheme)
 		protected.DELETE("/theme", themeController.DeleteTheme)
@@ -111,13 +87,8 @@ func main() {
 		// Puzzle management
 		protected.POST("/puzzle/upload", puzzleController.UploadPuzzle)
 		protected.DELETE("/puzzle", puzzleController.DeletePuzzle)
-	}
-	
-	// // Serve static files for frontend
-	// router.Static("/", "./public")
-	// router.NoRoute(func(c *gin.Context) {
-	// 	c.File("./public/index.html")
-	// })
+	// }
+
 	
 	// Make sure puzzles directory exists
 	os.MkdirAll(services.PuzzlesDir, 0755)

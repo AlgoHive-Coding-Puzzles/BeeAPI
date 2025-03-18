@@ -13,7 +13,6 @@ go.work
 
 # Dependency directories
 /vendor/
-/go.sum
 
 # Application specific
 /puzzles/*

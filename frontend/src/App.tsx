@@ -1,13 +1,29 @@
 import { useState } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import AppSidebar from "./components/Sidebar/Sidebar";
 import HomePage from "./pages/Home/Home";
+import ThemePage from "./pages/Theme/Theme";
+import Login from "./pages/Login/Login";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import useFetch from "./hooks/useFetch";
 import { ServerName } from "./types/ServerName";
-import ThemePage from "./pages/Theme/Theme";
 
-function App() {
+function AppContent() {
   const { data } = useFetch<ServerName>("/name");
   const [selectedMenu, setSelectedMenu] = useState("Home");
+  const { isAuthenticated } = useAuth();
+
+  console.log(isAuthenticated);
+
+  // Redirect to login if not authenticated
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
 
   const renderContent = () => {
     switch (true) {
@@ -40,6 +56,19 @@ function App() {
         <div className="mt-8">{renderContent()}</div>
       </div>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/*" element={<AppContent />} />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
 

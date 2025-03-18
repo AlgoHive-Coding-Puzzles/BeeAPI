@@ -1,43 +1,55 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import AuthService from "../services/AuthService";
 
-interface FetchOptions extends RequestInit {
-  method?: "GET" | "POST" | "PUT" | "DELETE";
-  body?: BodyInit | null;
-}
-
-const useFetch = <T>(url: string, options?: FetchOptions) => {
+export default function useFetch<T>(
+  url: string,
+  options?: RequestInit
+): {
+  data: T | null;
+  loading: boolean;
+  error: Error | null;
+  refetch: () => Promise<void>;
+} {
   const [data, setData] = useState<T | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<unknown>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<Error | null>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(url, {
-          method: options?.method || "GET",
-          headers: {
-            "Content-Type": "application/json",
-            ...options?.headers,
-          },
-          body: options?.body ? JSON.stringify(options.body) : null,
-        });
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        const result = await response.json();
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-        setData(result);
-      } catch (error) {
-        setError(error);
-      } finally {
-        setLoading(false);
+      const token = AuthService.getToken();
+      const headers = {
+        ...options?.headers,
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      };
+
+      const response = await fetch(url, {
+        ...options,
+        headers,
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    };
 
-    fetchData();
+      const result = await response.json();
+      setData(result);
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error(String(err)));
+    } finally {
+      setLoading(false);
+    }
   }, [url, options]);
 
-  return { data, loading, error };
-};
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
-export default useFetch;
+  const refetch = useCallback(async () => {
+    await fetchData();
+  }, [fetchData]);
+
+  return { data, loading, error, refetch };
+}

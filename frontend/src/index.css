@@ -38,3 +38,14 @@
   margin-top: 1.5rem;
   margin-left: 10rem;
 }
+
+/* Auth pages */
+.h-screen {
+  height: 100vh;
+}
+
+.auth-container {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 2rem;
+}

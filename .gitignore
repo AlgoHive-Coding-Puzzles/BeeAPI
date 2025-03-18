@@ -4,3 +4,4 @@
 puzzles/*
 !puzzles/sample
 __pycache__/
+.env

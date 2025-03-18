@@ -1,7 +1,16 @@
 import sys
 import signal
 import atexit
+from dotenv import load_dotenv
+from app.auth import create_user_from_env
 from app import app, loader
+
+# Try to load environment variables from .env file if it exists
+try:
+    load_dotenv()
+    create_user_from_env()
+except ImportError:
+    print("python-dotenv not installed, skipping .env file loading")
 
 def on_exit():
     loader.unload()

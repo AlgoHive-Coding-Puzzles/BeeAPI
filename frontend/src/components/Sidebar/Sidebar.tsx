@@ -1,5 +1,5 @@
 import classNames from "classnames";
-
+import UserMenu from "../UserMenu/UserMenu";
 import "./Sidebar.css";
 
 interface SidebarProps {
@@ -55,8 +55,8 @@ export default function Sidebar({
   ];
 
   return (
-    <nav className="w-56 p-sidebar-sm">
-      <div className="p-3 flex flex-col">
+    <nav className="w-56 p-sidebar-sm flex flex-col">
+      <div className="p-3 flex flex-col h-full">
         <div className="mb-8 mt-4 text-center">
           <i className="pi pi-box text-orange-500 sb-icon"></i>
         </div>
@@ -83,6 +83,9 @@ export default function Sidebar({
               </li>
             ))}
           </ul>
+        </div>
+        <div className="mt-auto">
+          <UserMenu />
         </div>
       </div>
     </nav>

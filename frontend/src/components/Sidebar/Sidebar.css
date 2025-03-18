@@ -4,6 +4,8 @@ nav {
   overflow: hidden;
   position: fixed;
   height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 nav .menu {
@@ -69,4 +71,11 @@ nav .menu .menuitem a:hover {
 
 .sb-icon {
   font-size: 1.5rem;
+}
+
+/* User menu styling */
+.user-menu {
+  border-top: 1px solid #333;
+  padding-top: 1rem;
+  margin-top: auto;
 }

@@ -224,8 +224,25 @@ func (p *PuzzleController) DeletePuzzle(c *gin.Context) {
 		return
 	}
 	
-	// TODO: Implement puzzle deletion
-	// This would remove the puzzle directory and .alghive file
+	// Delete the puzzle opened directory if it exists, and the .alghive file
+	puzzleDir := filepath.Join(services.PuzzlesDir, themeName, puzzleName)
+	if err := services.RemoveAll(puzzleDir); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete puzzle directory"})
+		return
+	}
+	alghiveFile := filepath.Join(services.PuzzlesDir, themeName, puzzleName+".alghive")
+	if err := services.RemoveAll(alghiveFile); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete puzzle file"})
+		return
+	}
+	
+	// Remove puzzle from theme
+	for i, puzzle := range theme.Puzzles {
+		if puzzle.GetName() == puzzleName {
+			theme.Puzzles = append(theme.Puzzles[:i], theme.Puzzles[i+1:]...)
+			break
+		}
+	}
 	
 	c.JSON(http.StatusOK, gin.H{"message": "Puzzle deleted"})
 }

@@ -3,6 +3,7 @@ package services
 import (
 	"archive/zip"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 	"sync"
@@ -163,54 +164,62 @@ func (p *PuzzlesLoader) HasTheme(name string) bool {
 	return p.GetTheme(name) != nil
 }
 
-// CreateTheme creates a new theme
 func (p *PuzzlesLoader) CreateTheme(name string) error {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	
-	if p.HasTheme(name) {
-		return os.ErrExist
-	}
-	
-	themePath := filepath.Join(PuzzlesDir, name)
-	err := os.MkdirAll(themePath, 0755)
-	if err != nil {
-		return err
-	}
-	
-	p.Themes = append(p.Themes, models.Theme{
-		Name: name,
-		Path: themePath,
-		Puzzles: []models.Puzzle{},
-	})
-	
-	return nil
+    log.Printf("Creating theme: %s", name)
+
+    p.mu.Lock()
+    defer p.mu.Unlock()
+
+    // Avoid calling HasTheme here to prevent a lock conflict
+    for _, theme := range p.Themes {
+        if theme.Name == name {
+            return os.ErrExist
+        }
+    }
+
+    themePath := filepath.Join(PuzzlesDir, name)
+    err := os.MkdirAll(themePath, 0755)
+    if err != nil {
+        return err
+    }
+
+    p.Themes = append(p.Themes, models.Theme{
+        Name:    name,
+        Path:    themePath,
+        Puzzles: []models.Puzzle{},
+    })
+
+    return nil
 }
 
-// DeleteTheme deletes a theme
 func (p *PuzzlesLoader) DeleteTheme(name string) error {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	
-	theme := p.GetTheme(name)
-	if theme == nil {
-		return os.ErrNotExist
-	}
-	
-	err := os.RemoveAll(theme.Path)
-	if err != nil {
-		return err
-	}
-	
-	// Remove theme from slice
-	for i, t := range p.Themes {
-		if t.Name == name {
-			p.Themes = append(p.Themes[:i], p.Themes[i+1:]...)
-			break
-		}
-	}
-	
-	return nil
+    p.mu.Lock()
+    defer p.mu.Unlock()
+
+    idx := -1
+    var themePath string
+
+    for i, theme := range p.Themes {
+        if theme.Name == name {
+            idx = i
+            themePath = theme.Path
+            break
+        }
+    }
+
+    if idx == -1 {
+        return os.ErrNotExist
+    }
+
+    err := os.RemoveAll(themePath)
+    if err != nil {
+        return err
+    }
+
+    // Remove theme from slice
+    p.Themes = append(p.Themes[:idx], p.Themes[idx+1:]...)
+
+    return nil
 }
 
 // GetPuzzleSizes returns the compressed and uncompressed sizes of a puzzle

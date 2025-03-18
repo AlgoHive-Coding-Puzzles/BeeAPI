@@ -19,3 +19,8 @@ func GetDirSize(path string) (int64, error) {
 	})
 	return size, err
 }
+
+// RemoveAll removes a directory and all its contents
+func RemoveAll(path string) error {
+	return os.RemoveAll(path)
+}

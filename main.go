@@ -130,7 +130,6 @@ func main() {
 	// Run server in a goroutine so it doesn't block
 	go func() {
 		log.Printf("Server starting on port %s", port)
-		log.Printf("API Key: %s", apiKeyManager.GetAPIKey())
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Server error: %v", err)
 		}

@@ -80,6 +80,7 @@ func main() {
 	// Puzzle routes (public)
 	router.GET("/puzzles", puzzleController.GetPuzzles)
 	router.GET("/puzzles/names", puzzleController.GetPuzzleNames)
+	router.GET("/puzzles/ids", puzzleController.GetPuzzlesIds)
 	router.GET("/puzzle", puzzleController.GetPuzzle)
 	router.GET("/puzzle/generate", puzzleController.GeneratePuzzle)
 	

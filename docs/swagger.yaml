@@ -106,7 +106,7 @@ paths:
         name: theme
         required: true
         type: string
-      - description: Puzzle name
+      - description: Puzzle Id
         in: query
         name: puzzle
         required: true
@@ -139,7 +139,7 @@ paths:
         name: theme
         required: true
         type: string
-      - description: Puzzle name
+      - description: Puzzle Id
         in: query
         name: puzzle
         required: true
@@ -169,7 +169,7 @@ paths:
         name: theme
         required: true
         type: string
-      - description: Puzzle name
+      - description: Puzzle Id
         in: query
         name: puzzle
         required: true
@@ -269,6 +269,33 @@ paths:
               type: string
             type: object
       summary: Get puzzles for a theme
+      tags:
+      - Puzzles
+  /puzzles/ids:
+    get:
+      description: Returns IDs of all puzzles for a specific theme
+      parameters:
+      - description: Theme name
+        in: query
+        name: theme
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get puzzle IDs
       tags:
       - Puzzles
   /puzzles/names:

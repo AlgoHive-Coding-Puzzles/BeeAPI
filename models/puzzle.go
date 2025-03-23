@@ -9,6 +9,7 @@ import (
 
 // Puzzle represents a programming challenge
 type Puzzle struct {
+	Id		    string `json:"id"`
 	Path        string `json:"-"`
 	Cipher      string `json:"-"`
 	Obscure     string `json:"-"`
@@ -90,4 +91,9 @@ func (p *Puzzle) GetDecryptPath() string {
 // GetUnveilPath returns the path to the unveil.py script
 func (p *Puzzle) GetUnveilPath() string {
 	return filepath.Join(p.Path, "unveil.py")
+}
+
+// GetId returns the ID of the puzzle
+func (p *Puzzle) GetId() string {
+	return p.MetaProps.ID
 }

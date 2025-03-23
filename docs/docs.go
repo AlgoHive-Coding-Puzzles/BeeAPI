@@ -116,7 +116,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Puzzle name",
+                        "description": "Puzzle Id",
                         "name": "puzzle",
                         "in": "query",
                         "required": true
@@ -164,7 +164,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Puzzle name",
+                        "description": "Puzzle Id",
                         "name": "puzzle",
                         "in": "query",
                         "required": true
@@ -212,7 +212,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Puzzle name",
+                        "description": "Puzzle Id",
                         "name": "puzzle",
                         "in": "query",
                         "required": true
@@ -345,6 +345,47 @@ const docTemplate = `{
                             "type": "array",
                             "items": {
                                 "$ref": "#/definitions/models.PuzzleResponse"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/puzzles/ids": {
+            "get": {
+                "description": "Returns IDs of all puzzles for a specific theme",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Puzzles"
+                ],
+                "summary": "Get puzzle IDs",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Theme name",
+                        "name": "theme",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
                             }
                         }
                     },

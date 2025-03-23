@@ -93,19 +93,46 @@ func (p *PuzzleController) GetPuzzleNames(c *gin.Context) {
 	c.JSON(http.StatusOK, puzzleNames)
 }
 
+// GetPuzzlesIds
+// @Summary Get puzzle IDs
+// @Description Returns IDs of all puzzles for a specific theme
+// @Tags Puzzles
+// @Produce json
+// @Param theme query string true "Theme name"
+// @Success 200 {array} string
+// @Failure 404 {object} map[string]string
+// @Router /puzzles/ids [get]
+func (p *PuzzleController) GetPuzzlesIds(c *gin.Context) {
+	themeName := c.Query("theme")
+	
+	theme := p.loader.GetTheme(themeName)
+	if theme == nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Theme not found"})
+		return
+	}
+	
+	var puzzleIds []string
+	
+	for _, puzzle := range theme.Puzzles {
+		puzzleIds = append(puzzleIds, puzzle.MetaProps.ID)
+	}
+	
+	c.JSON(http.StatusOK, puzzleIds)
+}
+
 // GetPuzzle godoc
 // @Summary Get puzzle details
 // @Description Returns details about a specific puzzle
 // @Tags Puzzles
 // @Produce json
 // @Param theme query string true "Theme name"
-// @Param puzzle query string true "Puzzle name"
+// @Param puzzle query string true "Puzzle Id"
 // @Success 200 {object} models.PuzzleResponse
 // @Failure 404 {object} map[string]string
 // @Router /puzzle [get]
 func (p *PuzzleController) GetPuzzle(c *gin.Context) {
 	themeName := c.Query("theme")
-	puzzleName := c.Query("puzzle")
+	puzzleId := c.Query("puzzle")
 	
 	theme := p.loader.GetTheme(themeName)
 	if theme == nil {
@@ -115,7 +142,7 @@ func (p *PuzzleController) GetPuzzle(c *gin.Context) {
 	
 	var foundPuzzle *models.Puzzle
 	for i, puzzle := range theme.Puzzles {
-		if puzzle.GetName() == puzzleName {
+		if puzzle.GetId() == puzzleId {
 			foundPuzzle = &theme.Puzzles[i]
 			break
 		}
@@ -195,14 +222,14 @@ func (p *PuzzleController) UploadPuzzle(c *gin.Context) {
 // @Tags Puzzles
 // @Produce json
 // @Param theme query string true "Theme name"
-// @Param puzzle query string true "Puzzle name"
+// @Param puzzle query string true "Puzzle Id"
 // @Success 200 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Router /puzzle [delete]
 // @Security Bearer
 func (p *PuzzleController) DeletePuzzle(c *gin.Context) {
 	themeName := c.Query("theme")
-	puzzleName := c.Query("puzzle")
+	puzzleId := c.Query("puzzle")
 	
 	theme := p.loader.GetTheme(themeName)
 	if theme == nil {
@@ -213,7 +240,7 @@ func (p *PuzzleController) DeletePuzzle(c *gin.Context) {
 	// Check if puzzle exists
 	var foundPuzzle *models.Puzzle
 	for i, puzzle := range theme.Puzzles {
-		if puzzle.GetName() == puzzleName {
+		if puzzle.GetId() == puzzleId {
 			foundPuzzle = &theme.Puzzles[i]
 			break
 		}
@@ -225,12 +252,12 @@ func (p *PuzzleController) DeletePuzzle(c *gin.Context) {
 	}
 	
 	// Delete the puzzle opened directory if it exists, and the .alghive file
-	puzzleDir := filepath.Join(services.PuzzlesDir, themeName, puzzleName)
+	puzzleDir := filepath.Join(services.PuzzlesDir, themeName, foundPuzzle.GetName())
 	if err := services.RemoveAll(puzzleDir); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete puzzle directory"})
 		return
 	}
-	alghiveFile := filepath.Join(services.PuzzlesDir, themeName, puzzleName+".alghive")
+	alghiveFile := filepath.Join(services.PuzzlesDir, themeName, foundPuzzle.GetName() + ".alghive")
 	if err := services.RemoveAll(alghiveFile); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete puzzle file"})
 		return
@@ -238,7 +265,7 @@ func (p *PuzzleController) DeletePuzzle(c *gin.Context) {
 	
 	// Remove puzzle from theme
 	for i, puzzle := range theme.Puzzles {
-		if puzzle.GetName() == puzzleName {
+		if puzzle.GetName() == foundPuzzle.GetName() {
 			theme.Puzzles = append(theme.Puzzles[:i], theme.Puzzles[i+1:]...)
 			break
 		}
@@ -253,7 +280,7 @@ func (p *PuzzleController) DeletePuzzle(c *gin.Context) {
 // @Tags Puzzles
 // @Produce json
 // @Param theme query string true "Theme name"
-// @Param puzzle query string true "Puzzle name"
+// @Param puzzle query string true "Puzzle Id"
 // @Param unique_id query string true "Unique ID for generation"
 // @Success 200 {object} map[string]interface{}
 // @Failure 404 {object} map[string]string
@@ -261,7 +288,7 @@ func (p *PuzzleController) DeletePuzzle(c *gin.Context) {
 // @Router /puzzle/generate [get]
 func (p *PuzzleController) GeneratePuzzle(c *gin.Context) {
 	themeName := c.Query("theme")
-	puzzleName := c.Query("puzzle")
+	puzzleId := c.Query("puzzle")
 	uniqueID := c.Query("unique_id")
 	
 	theme := p.loader.GetTheme(themeName)
@@ -272,7 +299,7 @@ func (p *PuzzleController) GeneratePuzzle(c *gin.Context) {
 	
 	var foundPuzzle *models.Puzzle
 	for i, puzzle := range theme.Puzzles {
-		if puzzle.GetName() == puzzleName {
+		if puzzle.GetId() == puzzleId {
 			foundPuzzle = &theme.Puzzles[i]
 			break
 		}

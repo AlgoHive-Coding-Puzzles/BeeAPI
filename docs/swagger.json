@@ -232,7 +232,7 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
-                                "type": "string"
+                                "type": "boolean"
                             }
                         }
                     },
@@ -303,7 +303,7 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
-                                "type": "string"
+                                "type": "boolean"
                             }
                         }
                     },

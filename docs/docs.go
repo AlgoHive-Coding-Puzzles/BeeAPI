@@ -238,7 +238,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
-                                "type": "string"
+                                "type": "boolean"
                             }
                         }
                     },
@@ -309,7 +309,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
-                                "type": "string"
+                                "type": "boolean"
                             }
                         }
                     },

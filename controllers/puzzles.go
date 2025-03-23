@@ -331,7 +331,7 @@ func (p *PuzzleController) GeneratePuzzleInput(c *gin.Context) {
 // @Param puzzle query string true "Puzzle Id"
 // @Param unique_id query string true "Unique ID for generation"
 // @Param solution query string true "Solution to check"
-// @Success 200 {object} map[string]string
+// @Success 200 {object} map[string]bool
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
 // @Router /puzzle/check/first [get]
@@ -374,9 +374,10 @@ func (p *PuzzleController) CheckFirstSolution(c *gin.Context) {
     }
 
     if firstSolution == solution {
-        c.JSON(http.StatusOK, gin.H{"message": "First solution matches"})
+		// Return true or false
+        c.JSON(http.StatusOK, gin.H{ "matches": true })
     } else {
-        c.JSON(http.StatusOK, gin.H{"message": "First solution does not match"})
+        c.JSON(http.StatusOK, gin.H{ "matches": false })
     }
 }
 
@@ -389,7 +390,7 @@ func (p *PuzzleController) CheckFirstSolution(c *gin.Context) {
 // @Param puzzle query string true "Puzzle Id"
 // @Param unique_id query string true "Unique ID for generation"
 // @Param solution query string true "Solution to check"
-// @Success 200 {object} map[string]string
+// @Success 200 {object} map[string]bool
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
 // @Router /puzzle/check/second [get]
@@ -432,8 +433,8 @@ func (p *PuzzleController) CheckSecondSolution(c *gin.Context) {
     }
 
     if secondSolution == solution {
-        c.JSON(http.StatusOK, gin.H{"message": "Second solution matches"})
+        c.JSON(http.StatusOK, gin.H{"matches": true})
     } else {
-        c.JSON(http.StatusOK, gin.H{"message": "Second solution does not match"})
+        c.JSON(http.StatusOK, gin.H{"matches": false})
     }
 }

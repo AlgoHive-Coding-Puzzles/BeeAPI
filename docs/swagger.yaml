@@ -191,7 +191,7 @@ paths:
           description: OK
           schema:
             additionalProperties:
-              type: string
+              type: boolean
             type: object
         "404":
           description: Not Found
@@ -239,7 +239,7 @@ paths:
           description: OK
           schema:
             additionalProperties:
-              type: string
+              type: boolean
             type: object
         "404":
           description: Not Found

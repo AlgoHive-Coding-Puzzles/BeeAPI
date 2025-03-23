@@ -3,7 +3,6 @@ package services
 import (
 	"archive/zip"
 	"io"
-	"log"
 	"os"
 	"path/filepath"
 	"sync"
@@ -165,8 +164,6 @@ func (p *PuzzlesLoader) HasTheme(name string) bool {
 }
 
 func (p *PuzzlesLoader) CreateTheme(name string) error {
-    log.Printf("Creating theme: %s", name)
-
     p.mu.Lock()
     defer p.mu.Unlock()
 

@@ -3,6 +3,7 @@ package services
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -72,5 +73,7 @@ func (a *APIKeyManager) GetAPIKey() string {
 
 // ValidateKey vérifie si la clé fournie correspond à celle stockée
 func (a *APIKeyManager) ValidateKey(key string) bool {
+	log.Printf("Validating API key: %s\n", a.apiKey)
+	log.Printf("Provided API key: %s\n", key)
 	return key == a.apiKey
 }

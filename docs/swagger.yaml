@@ -160,9 +160,105 @@ paths:
       summary: Get puzzle details
       tags:
       - Puzzles
-  /puzzle/generate:
+  /puzzle/check/first:
     get:
-      description: Generates puzzle input and calculates solutions for a given puzzle
+      description: Checks if the first solution matches the provided value
+      parameters:
+      - description: Theme name
+        in: query
+        name: theme
+        required: true
+        type: string
+      - description: Puzzle Id
+        in: query
+        name: puzzle
+        required: true
+        type: string
+      - description: Unique ID for generation
+        in: query
+        name: unique_id
+        required: true
+        type: string
+      - description: Solution to check
+        in: query
+        name: solution
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Check first solution
+      tags:
+      - Puzzles
+  /puzzle/check/second:
+    get:
+      description: Checks if the second solution matches the provided value
+      parameters:
+      - description: Theme name
+        in: query
+        name: theme
+        required: true
+        type: string
+      - description: Puzzle Id
+        in: query
+        name: puzzle
+        required: true
+        type: string
+      - description: Unique ID for generation
+        in: query
+        name: unique_id
+        required: true
+        type: string
+      - description: Solution to check
+        in: query
+        name: solution
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Check second solution
+      tags:
+      - Puzzles
+  /puzzle/generate/input:
+    get:
+      description: Generates puzzle input for a given puzzle
       parameters:
       - description: Theme name
         in: query
@@ -199,7 +295,7 @@ paths:
             additionalProperties:
               type: string
             type: object
-      summary: Generate puzzle input and solutions
+      summary: Generate puzzle input
       tags:
       - Puzzles
   /puzzle/upload:

@@ -274,9 +274,9 @@ func (p *PuzzleController) DeletePuzzle(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Puzzle deleted"})
 }
 
-// GeneratePuzzle godoc
-// @Summary Generate puzzle input and solutions
-// @Description Generates puzzle input and calculates solutions for a given puzzle
+// GeneratePuzzleInput godoc
+// @Summary Generate puzzle input
+// @Description Generates puzzle input for a given puzzle
 // @Tags Puzzles
 // @Produce json
 // @Param theme query string true "Theme name"
@@ -285,54 +285,155 @@ func (p *PuzzleController) DeletePuzzle(c *gin.Context) {
 // @Success 200 {object} map[string]interface{}
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /puzzle/generate [get]
-func (p *PuzzleController) GeneratePuzzle(c *gin.Context) {
-	themeName := c.Query("theme")
-	puzzleId := c.Query("puzzle")
-	uniqueID := c.Query("unique_id")
-	
-	theme := p.loader.GetTheme(themeName)
-	if theme == nil {
-		c.JSON(http.StatusNotFound, gin.H{"message": "Theme not found"})
-		return
-	}
-	
-	var foundPuzzle *models.Puzzle
-	for i, puzzle := range theme.Puzzles {
-		if puzzle.GetId() == puzzleId {
-			foundPuzzle = &theme.Puzzles[i]
-			break
-		}
-	}
-	
-	if foundPuzzle == nil {
-		c.JSON(http.StatusNotFound, gin.H{"message": "Puzzle not found"})
-		return
-	}
-	
-	// Use pythonRunner to generate input and solutions
-	linesCount := 400 // Default value, could be made configurable
-	inputLines, err := p.pythonRunner.RunForge(foundPuzzle.GetForgePath(), linesCount, uniqueID)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate puzzle input: " + err.Error()})
-		return
-	}
-	
-	firstSolution, err := p.pythonRunner.RunDecrypt(foundPuzzle.GetDecryptPath(), inputLines)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to solve first part: " + err.Error()})
-		return
-	}
-	
-	secondSolution, err := p.pythonRunner.RunUnveil(foundPuzzle.GetUnveilPath(), inputLines)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to solve second part: " + err.Error()})
-		return
-	}
-	
-	c.JSON(http.StatusOK, gin.H{
-		"first_solution":  firstSolution,
-		"second_solution": secondSolution,
-		"input_lines":     inputLines,
-	})
+// @Router /puzzle/generate/input [get]
+func (p *PuzzleController) GeneratePuzzleInput(c *gin.Context) {
+    themeName := c.Query("theme")
+    puzzleId := c.Query("puzzle")
+    uniqueID := c.Query("unique_id")
+
+    theme := p.loader.GetTheme(themeName)
+    if theme == nil {
+        c.JSON(http.StatusNotFound, gin.H{"message": "Theme not found"})
+        return
+    }
+
+    var foundPuzzle *models.Puzzle
+    for i, puzzle := range theme.Puzzles {
+        if puzzle.GetId() == puzzleId {
+            foundPuzzle = &theme.Puzzles[i]
+            break
+        }
+    }
+
+    if foundPuzzle == nil {
+        c.JSON(http.StatusNotFound, gin.H{"message": "Puzzle not found"})
+        return
+    }
+
+    linesCount := 400 // Default value, could be made configurable
+    inputLines, err := p.pythonRunner.RunForge(foundPuzzle.GetForgePath(), linesCount, uniqueID)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate puzzle input: " + err.Error()})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{
+        "input_lines": inputLines,
+    })
+}
+
+// CheckFirstSolution godoc
+// @Summary Check first solution
+// @Description Checks if the first solution matches the provided value
+// @Tags Puzzles
+// @Produce json
+// @Param theme query string true "Theme name"
+// @Param puzzle query string true "Puzzle Id"
+// @Param unique_id query string true "Unique ID for generation"
+// @Param solution query string true "Solution to check"
+// @Success 200 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /puzzle/check/first [get]
+func (p *PuzzleController) CheckFirstSolution(c *gin.Context) {
+    themeName := c.Query("theme")
+    puzzleId := c.Query("puzzle")
+    uniqueID := c.Query("unique_id")
+    solution := c.Query("solution")
+
+    theme := p.loader.GetTheme(themeName)
+    if theme == nil {
+        c.JSON(http.StatusNotFound, gin.H{"message": "Theme not found"})
+        return
+    }
+
+    var foundPuzzle *models.Puzzle
+    for i, puzzle := range theme.Puzzles {
+        if puzzle.GetId() == puzzleId {
+            foundPuzzle = &theme.Puzzles[i]
+            break
+        }
+    }
+
+    if foundPuzzle == nil {
+        c.JSON(http.StatusNotFound, gin.H{"message": "Puzzle not found"})
+        return
+    }
+
+    linesCount := 400 // Default value, could be made configurable
+    inputLines, err := p.pythonRunner.RunForge(foundPuzzle.GetForgePath(), linesCount, uniqueID)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate puzzle input: " + err.Error()})
+        return
+    }
+
+    firstSolution, err := p.pythonRunner.RunDecrypt(foundPuzzle.GetDecryptPath(), inputLines)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to solve first part: " + err.Error()})
+        return
+    }
+
+    if firstSolution == solution {
+        c.JSON(http.StatusOK, gin.H{"message": "First solution matches"})
+    } else {
+        c.JSON(http.StatusOK, gin.H{"message": "First solution does not match"})
+    }
+}
+
+// CheckSecondSolution godoc
+// @Summary Check second solution
+// @Description Checks if the second solution matches the provided value
+// @Tags Puzzles
+// @Produce json
+// @Param theme query string true "Theme name"
+// @Param puzzle query string true "Puzzle Id"
+// @Param unique_id query string true "Unique ID for generation"
+// @Param solution query string true "Solution to check"
+// @Success 200 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /puzzle/check/second [get]
+func (p *PuzzleController) CheckSecondSolution(c *gin.Context) {
+    themeName := c.Query("theme")
+    puzzleId := c.Query("puzzle")
+    uniqueID := c.Query("unique_id")
+    solution := c.Query("solution")
+
+    theme := p.loader.GetTheme(themeName)
+    if theme == nil {
+        c.JSON(http.StatusNotFound, gin.H{"message": "Theme not found"})
+        return
+    }
+
+    var foundPuzzle *models.Puzzle
+    for i, puzzle := range theme.Puzzles {
+        if puzzle.GetId() == puzzleId {
+            foundPuzzle = &theme.Puzzles[i]
+            break
+        }
+    }
+
+    if foundPuzzle == nil {
+        c.JSON(http.StatusNotFound, gin.H{"message": "Puzzle not found"})
+        return
+    }
+
+    linesCount := 400 // Default value, could be made configurable
+    inputLines, err := p.pythonRunner.RunForge(foundPuzzle.GetForgePath(), linesCount, uniqueID)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate puzzle input: " + err.Error()})
+        return
+    }
+
+    secondSolution, err := p.pythonRunner.RunUnveil(foundPuzzle.GetUnveilPath(), inputLines)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to solve second part: " + err.Error()})
+        return
+    }
+
+    if secondSolution == solution {
+        c.JSON(http.StatusOK, gin.H{"message": "Second solution matches"})
+    } else {
+        c.JSON(http.StatusOK, gin.H{"message": "Second solution does not match"})
+    }
 }

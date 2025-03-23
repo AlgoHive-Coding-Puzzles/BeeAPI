@@ -82,7 +82,9 @@ func main() {
 	router.GET("/puzzles/names", puzzleController.GetPuzzleNames)
 	router.GET("/puzzles/ids", puzzleController.GetPuzzlesIds)
 	router.GET("/puzzle", puzzleController.GetPuzzle)
-	router.GET("/puzzle/generate", puzzleController.GeneratePuzzle)
+	router.GET("/puzzle/generate/input", puzzleController.GeneratePuzzleInput)
+	router.GET("/puzzle/check/first", puzzleController.CheckFirstSolution)
+	router.GET("/puzzle/check/second", puzzleController.CheckSecondSolution)
 	
 	// Protected routes with API key authentication
 	protected := router.Group("")

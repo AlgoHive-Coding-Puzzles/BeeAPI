@@ -186,16 +186,158 @@
                 }
             }
         },
-        "/puzzle/generate": {
+        "/puzzle/check/first": {
             "get": {
-                "description": "Generates puzzle input and calculates solutions for a given puzzle",
+                "description": "Checks if the first solution matches the provided value",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Puzzles"
                 ],
-                "summary": "Generate puzzle input and solutions",
+                "summary": "Check first solution",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Theme name",
+                        "name": "theme",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Puzzle Id",
+                        "name": "puzzle",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Unique ID for generation",
+                        "name": "unique_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Solution to check",
+                        "name": "solution",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/puzzle/check/second": {
+            "get": {
+                "description": "Checks if the second solution matches the provided value",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Puzzles"
+                ],
+                "summary": "Check second solution",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Theme name",
+                        "name": "theme",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Puzzle Id",
+                        "name": "puzzle",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Unique ID for generation",
+                        "name": "unique_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Solution to check",
+                        "name": "solution",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/puzzle/generate/input": {
+            "get": {
+                "description": "Generates puzzle input for a given puzzle",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Puzzles"
+                ],
+                "summary": "Generate puzzle input",
                 "parameters": [
                     {
                         "type": "string",

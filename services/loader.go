@@ -289,9 +289,6 @@ func (p *PuzzlesLoader) loadPuzzle(themeName, puzzleName, puzzlePath string) (mo
 		return puzzle, err
 	}
 	
-	// Load plugins (in a real implementation, you would compile Go plugins from Python code)
-	// For now, we'll just create placeholder plugins that will be replaced by actual implementation
-	
 	return puzzle, nil
 }
 

@@ -43,10 +43,13 @@ func (t *ThemeController) GetThemes(c *gin.Context) {
 			
 			puzzleResponse := models.PuzzleResponse{
 				Name:            puzzle.GetName(),
+				Title:           puzzle.DescProps.Title,
+				Index:           puzzle.DescProps.Index,
 				Difficulty:      puzzle.DescProps.Difficulty,
 				Language:        puzzle.DescProps.Language,
 				CompressedSize:  compressedSize,
 				UncompressedSize: uncompressedSize,
+				HivecraftVersion: puzzle.MetaProps.HivecraftVersion,
 				Cipher:          puzzle.Cipher,
 				Obscure:         puzzle.Obscure,
 				ID:              puzzle.MetaProps.ID,
@@ -115,10 +118,13 @@ func (t *ThemeController) GetTheme(c *gin.Context) {
 		
 		puzzleResponse := models.PuzzleResponse{
 			Name:            puzzle.GetName(),
+			Title:           puzzle.DescProps.Title,
+			Index:           puzzle.DescProps.Index,
 			Difficulty:      puzzle.DescProps.Difficulty,
 			Language:        puzzle.DescProps.Language,
 			CompressedSize:  compressedSize,
 			UncompressedSize: uncompressedSize,
+			HivecraftVersion: puzzle.MetaProps.HivecraftVersion,
 			Cipher:          puzzle.Cipher,
 			Obscure:         puzzle.Obscure,
 			ID:              puzzle.MetaProps.ID,

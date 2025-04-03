@@ -48,10 +48,13 @@ func (p *PuzzleController) GetPuzzles(c *gin.Context) {
 		
 		puzzleResponse := models.PuzzleResponse{
 			Name:            puzzle.GetName(),
+			Title:           puzzle.DescProps.Title,
+			Index:           puzzle.DescProps.Index,
 			Difficulty:      puzzle.DescProps.Difficulty,
 			Language:        puzzle.DescProps.Language,
 			CompressedSize:  compressedSize,
 			UncompressedSize: uncompressedSize,
+			HivecraftVersion: puzzle.MetaProps.HivecraftVersion,
 			Cipher:          puzzle.Cipher,
 			Obscure:         puzzle.Obscure,
 			ID:              puzzle.MetaProps.ID,
@@ -157,10 +160,13 @@ func (p *PuzzleController) GetPuzzle(c *gin.Context) {
 	
 	puzzleResponse := models.PuzzleResponse{
 		Name:            foundPuzzle.GetName(),
+		Title:		     foundPuzzle.DescProps.Title,	
+		Index:           foundPuzzle.DescProps.Index,
 		Difficulty:      foundPuzzle.DescProps.Difficulty,
 		Language:        foundPuzzle.DescProps.Language,
 		CompressedSize:  compressedSize,
 		UncompressedSize: uncompressedSize,
+		HivecraftVersion: foundPuzzle.MetaProps.HivecraftVersion,
 		Cipher:          foundPuzzle.Cipher,
 		Obscure:         foundPuzzle.Obscure,
 		ID:              foundPuzzle.MetaProps.ID,

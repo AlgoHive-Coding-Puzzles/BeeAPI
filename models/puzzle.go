@@ -23,10 +23,13 @@ type Puzzle struct {
 // PuzzleResponse represents puzzle data for API responses
 type PuzzleResponse struct {
 	Name            string `json:"name"`
+	Title 		 	string `json:"title"`
+	Index           string `json:"index"`
 	Difficulty      string `json:"difficulty"`
 	Language        string `json:"language"`
 	CompressedSize  int64  `json:"compressedSize"`
 	UncompressedSize int64 `json:"uncompressedSize"`
+	HivecraftVersion string `json:"hivecraftVersion"`
 	Cipher          string `json:"cipher"`
 	Obscure         string `json:"obscure"`
 	ID              string `json:"id"`
@@ -38,11 +41,12 @@ type PuzzleResponse struct {
 // MetaProps represents metadata XML properties for a puzzle
 type MetaProps struct {
 	XMLName  xml.Name `xml:"Properties"`
-	Author   string   `xml:"author"`
-	Created  string   `xml:"created"`
-	Modified string   `xml:"modified"`
-	Title    string   `xml:"title"`
-	ID       string   `xml:"id"`
+	Author   			string   `xml:"author"`
+	Created  			string   `xml:"created"`
+	Modified 			string   `xml:"modified"`
+	HivecraftVersion  	string   `xml:"hivecraftVersion"`
+	Title    			string   `xml:"title"`
+	ID       			string   `xml:"id"`
 }
 
 // DescProps represents description XML properties for a puzzle
@@ -50,6 +54,8 @@ type DescProps struct {
 	XMLName    xml.Name `xml:"Properties"`
 	Difficulty string   `xml:"difficulty"`
 	Language   string   `xml:"language"`
+	Title      string   `xml:"title"`
+	Index      string   `xml:"index"`
 }
 
 // GetName returns the name of the puzzle (last part of the path)
@@ -96,4 +102,19 @@ func (p *Puzzle) GetUnveilPath() string {
 // GetId returns the ID of the puzzle
 func (p *Puzzle) GetId() string {
 	return p.MetaProps.ID
+}
+
+// GetPuzzleTitle returns the title of the puzzle
+func (p *Puzzle) GetPuzzleTitle() string {
+	return p.DescProps.Title
+}
+
+// GetPuzzleIndex returns the index of the puzzle
+func (p *Puzzle) GetPuzzleIndex() string {
+	return p.DescProps.Index
+}
+
+// GetPuzzleHivecraftVersion returns the Hivecraft version of the puzzle
+func (p *Puzzle) GetPuzzleHivecraftVersion() string {
+	return p.MetaProps.HivecraftVersion
 }

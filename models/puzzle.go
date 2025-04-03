@@ -44,7 +44,7 @@ type MetaProps struct {
 	Author   			string   `xml:"author"`
 	Created  			string   `xml:"created"`
 	Modified 			string   `xml:"modified"`
-	HivecraftVersion  	string   `xml:"hivecraftVersion"`
+	HivecraftVersion  	string   `xml:"hivecraft-version"`
 	Title    			string   `xml:"title"`
 	ID       			string   `xml:"id"`
 }

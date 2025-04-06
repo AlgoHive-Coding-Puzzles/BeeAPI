@@ -4,26 +4,60 @@
 
 <h1 align="center">BeeAPI Go</h1>
 
-## Self-Hostable API for AlgoHive
+<p align="center">
+  <b>A high-performance, self-hostable API service for AlgoHive puzzle distribution</b>
+</p>
 
-BeeAPI Go is a Go implementation of the BeeAPI service, designed to load puzzles from `.alghive` files, organized into themes, and serve them to the AlgoHive platform independently. It comes with a Swagger UI to test the API endpoints and a simple web interface to manage the puzzles.
+## Overview
 
-![Swagger](img/swagger.png)
+BeeAPI Go is a robust Go implementation of the BeeAPI service, designed with a microservice architecture for high availability and horizontal scaling. It provides a comprehensive API for loading, managing, and serving puzzles from `.alghive` files to the AlgoHive platform. The service is built with performance and reliability in mind, allowing for independent deployment across multiple environments.
 
-## AlgoHive
+## Key Features
 
-AlgoHive is a web, self-hostable platform that allows developers to create puzzles for other developers to solve. Each puzzle contains two parts to solve, allowing developers to test their skills in a variety of ways. The puzzles are created using a proprietary file format that is compiled into a single file for distribution.
+- **Dynamic Puzzle Management**: Automatically extracts, loads, and unloads puzzles from `.alghive` files
+- **Stateless Architecture**: Designed for easy replication across multiple instances
+- **High Availability Design**: Can be deployed in redundant configurations for zero downtime
+- **Secure API Authentication**: API key-based authentication for protected endpoints
+- **Comprehensive API**: Full suite of endpoints for puzzle discovery and interaction
+- **Swagger Documentation**: Interactive API documentation for easy integration
+- **Container-Ready**: Optimized for Docker and container orchestration platforms
+- **Efficient Resource Usage**: Intelligent memory management for puzzle loading/unloading
+
+## Technical Architecture
+
+BeeAPI Go implements a clean architecture pattern with clear separation between:
+
+- **Service Layer**: Handles core business logic including puzzle extraction and loading
+- **Controller Layer**: Manages API endpoints and request/response handling
+- **Model Layer**: Defines data structures for puzzles and themes
+- **Middleware Layer**: Provides authentication and request processing
+
+The service is designed to be stateless, making it ideal for horizontal scaling in high availability environments. Multiple BeeAPI instances can be deployed behind a load balancer to distribute traffic and provide redundancy.
+
+## Puzzle Management System
+
+BeeAPI employs a sophisticated puzzle management system:
+
+1. **Initial Loading**: When the server starts, it scans the `puzzles` directory structure
+2. **Extraction Process**: `.alghive` files are automatically extracted into their component files
+3. **Memory Management**: Puzzles are loaded into memory with optimized resource usage
+4. **Graceful Unloading**: On shutdown, puzzle resources are properly released
+5. **Dynamic Reloading**: Themes and puzzles can be reloaded without service interruption
+
+This design allows for efficient management of puzzle resources while maintaining high performance.
+
+## AlgoHive Platform
+
+AlgoHive is a web-based, self-hostable platform that enables developers to create and solve coding puzzles. Each puzzle contains two parts to solve, challenging developers to apply different skills and approaches. The puzzles are distributed using the proprietary `.alghive` file format, which BeeAPI is designed to process.
 
 ## Installation
 
-### Local
-
-To use BeeAPI Go, you need to have Go 1.16 or higher installed on your system.
+### Local Development
 
 ```bash
 # Clone the repository
-git clone https://github.com/AlgoHive-Coding-Puzzles/BeeAPI-Go.git
-cd BeeAPI-Go
+git clone https://github.com/AlgoHive-Coding-Puzzles/BeeAPI.git
+cd BeeAPI
 
 # Build the application
 go build -o beeapi
@@ -32,67 +66,76 @@ go build -o beeapi
 ./beeapi
 ```
 
-Feed the `puzzles` directory with themes folders containing `.alghive` files or use the Web interface to manage the puzzles for the BeeAPI instance.
+### Docker Deployment
+
+```bash
+# Build the Docker image
+docker build -t beeapi-go .
+
+# Run as a container
+docker run -d -p 8080:8080 --name beeapi-go \
+  -v $(pwd)/puzzles:/app/puzzles \
+  -v $(pwd)/data:/app/data \
+  beeapi-go
+```
+
+### High Availability Deployment
+
+For production environments, BeeAPI can be deployed in a high availability configuration:
+
+1. Deploy multiple instances behind a load balancer
+2. Use a shared storage volume for puzzle files (NFS, S3, etc.)
+3. Implement health checks for automatic instance recovery
+4. Configure instance auto-scaling based on load
+
+## Directory Structure
 
 ```
 beeapi/
-├── puzzles/
-│   ├── theme1/
-│   │   ├── puzzle1.alghive
+├── puzzles/                  # Root directory for puzzle content
+│   ├── theme1/               # Theme directory
+│   │   ├── puzzle1.alghive   # Compressed puzzle file
+│   │   ├── puzzle1/          # Extracted puzzle directory (created at runtime)
 │   │   ├── puzzle2.alghive
+│   │   ├── puzzle2/
 │   ├── theme2/
 │   │   ├── puzzle3.alghive
-│   │   ├── puzzle4.alghive
-```
-
-### Docker
-
-You can also run the API using Docker. To build the Docker image:
-
-```bash
-docker build -t beeapi-go .
-```
-
-Then, run the Docker container:
-
-```bash
-docker run -d -p 8080:8080 --name beeapi-go -v $(pwd)/puzzles:/app/puzzles -v $(pwd)/data:/app/data beeapi-go
+│   │   ├── puzzle3/
 ```
 
 ## API Authentication
 
-BeeAPI Go uses API key authentication for protected endpoints (POST, PUT, DELETE). When the server starts for the first time, it generates a unique API key and saves it in a `.api-key` file in the root directory.
+BeeAPI Go implements a secure API key authentication system for protected endpoints:
 
-To authenticate your requests to protected endpoints:
-
-1. Look for the API key in the `.api-key` file or in the server logs when it starts
-2. Include the API key in your requests' Authorization header:
+- An API key is automatically generated on first startup
+- The key is stored in a `.api-key` file in the root directory
+- Protected endpoints (POST, PUT, DELETE) require this key in the Authorization header
+- The key can be retrieved via the authenticated `/apikey` endpoint
 
 ```bash
+# Example authenticated request
 curl -X POST "http://localhost:5000/theme" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -d "name=new-theme"
 ```
 
-If you're using Docker, you can access the API key by:
-
-```bash
-docker exec beeapi-go cat /app/.api-key
-```
-
-Make sure to keep this key secure as it provides administrative access to your BeeAPI instance.
-
 ## API Documentation
 
-The API documentation is available at `/swagger/index.html` when the server is running.
+The API documentation is accessible through Swagger UI at `/swagger/index.html` when the server is running. This provides:
 
-## Environment Variables
+- Interactive API testing interface
+- Complete endpoint documentation
+- Request/response schema details
+- Authentication requirements
 
-The following environment variables can be used to configure the server:
+## Configuration
+
+BeeAPI can be configured using environment variables:
 
 - `SERVER_NAME`: The name of the server (default: "Local")
 - `SERVER_DESCRIPTION`: A description of the server (default: "Local Dev Server")
-- `USER_*`: Create users automatically, for example `USER_ADMIN=adminpassword`
+- `PORT`: The port to run the server on (default: 5000)
+- `PYTHON_PATH`: Path to Python interpreter for puzzle execution (default: "python")
 
 ## License
 

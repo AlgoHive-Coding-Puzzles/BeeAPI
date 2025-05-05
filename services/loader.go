@@ -2,6 +2,8 @@ package services
 
 import (
 	"archive/zip"
+	"errors"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -22,6 +24,7 @@ type PuzzlesLoader struct {
 func NewPuzzlesLoader() *PuzzlesLoader {
 	return &PuzzlesLoader{
 		Themes: []models.Theme{},
+		mu:     sync.RWMutex{},
 	}
 }
 
@@ -240,6 +243,127 @@ func (p *PuzzlesLoader) GetPuzzleSizes(themeName, puzzleName string) (int64, int
 	}
 	
 	return alghiveInfo.Size(), dirSize, nil
+}
+
+// HotSwap replaces a puzzle with another one with the same ID
+func (p *PuzzlesLoader) HotSwap(themeName string, puzzleID string, newPuzzleFile string) error {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	// Find theme directly without using GetTheme to avoid deadlock
+	var theme *models.Theme
+	for i, t := range p.Themes {
+		if t.Name == themeName {
+			theme = &p.Themes[i]
+			break
+		}
+	}
+
+	if theme == nil {
+		return errors.New("theme not found")
+	}
+
+	// Find puzzle with the given ID
+	var foundPuzzle *models.Puzzle
+	var puzzleName string
+	var puzzleIndex int
+	for i, puzzle := range theme.Puzzles {
+		if puzzle.GetId() == puzzleID {
+			foundPuzzle = &theme.Puzzles[i]
+			puzzleName = puzzle.GetName()
+			puzzleIndex = i
+			break
+		}
+	}
+
+	if foundPuzzle == nil {
+		return errors.New("puzzle not found")
+	}
+
+	// Create temporary directory for extraction
+	tempDir := filepath.Join(os.TempDir(), "puzzle_hotswap_"+puzzleID)
+	defer os.RemoveAll(tempDir)
+	
+	// Extract new puzzle to temp directory
+	err := unzip(newPuzzleFile, tempDir)
+	if err != nil {
+		return fmt.Errorf("failed to extract new puzzle: %w", err)
+	}
+
+	// Load new puzzle to verify ID
+	newPuzzle, err := p.loadPuzzle(themeName, filepath.Base(tempDir), tempDir)
+	if err != nil {
+		return fmt.Errorf("failed to load new puzzle: %w", err)
+	}
+
+	// Verify that the new puzzle has the same ID
+	if newPuzzle.GetId() != puzzleID {
+		return fmt.Errorf("new puzzle ID (%s) does not match expected ID (%s)", newPuzzle.GetId(), puzzleID)
+	}
+
+	// Get paths
+	oldPuzzlePath := foundPuzzle.Path
+	oldAlghiveFile := filepath.Join(theme.Path, puzzleName+".alghive")
+	newAlghiveFile := filepath.Join(theme.Path, puzzleName+".alghive")
+
+	// Backup old puzzle file
+	backupFile := oldAlghiveFile + ".backup"
+	if err := copyFile(oldAlghiveFile, backupFile); err != nil {
+		return fmt.Errorf("failed to backup old puzzle file: %w", err)
+	}
+
+	// Replace old .alghive file with new one
+	if err := copyFile(newPuzzleFile, newAlghiveFile); err != nil {
+		// Restore backup if copy fails
+		os.Rename(backupFile, oldAlghiveFile)
+		return fmt.Errorf("failed to replace puzzle file: %w", err)
+	}
+
+	// Remove backup file
+	os.Remove(backupFile)
+
+	// Remove old extracted puzzle directory
+	if err := os.RemoveAll(oldPuzzlePath); err != nil {
+		return fmt.Errorf("failed to remove old puzzle directory: %w", err)
+	}
+
+	// Extract new puzzle
+	if err := unzip(newAlghiveFile, oldPuzzlePath); err != nil {
+		return fmt.Errorf("failed to extract new puzzle: %w", err)
+	}
+
+	// Reload puzzle
+	newLoadedPuzzle, err := p.loadPuzzle(themeName, puzzleName, oldPuzzlePath)
+	if err != nil {
+		return fmt.Errorf("failed to reload puzzle: %w", err)
+	}
+
+	// Update puzzle in memory directly
+	theme.Puzzles[puzzleIndex] = newLoadedPuzzle
+
+	return nil
+}
+
+// Helper function to copy a file
+func copyFile(src, dst string) error {
+	srcFile, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer srcFile.Close()
+
+	dstFile, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer dstFile.Close()
+
+	_, err = io.Copy(dstFile, srcFile)
+	if err != nil {
+		return err
+	}
+
+	return dstFile.Sync()
 }
 
 // Helper functions

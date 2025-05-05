@@ -396,6 +396,87 @@ const docTemplate = `{
                 }
             }
         },
+        "/puzzle/hotswap": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Replaces a puzzle with a new version keeping the same ID",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Puzzles"
+                ],
+                "summary": "Hot swap a puzzle",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Theme name",
+                        "name": "theme",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Puzzle ID to replace",
+                        "name": "puzzle_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "New puzzle file (.alghive)",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/puzzle/upload": {
             "post": {
                 "security": [
@@ -813,7 +894,13 @@ const docTemplate = `{
                 "difficulty": {
                     "type": "string"
                 },
+                "hivecraftVersion": {
+                    "type": "string"
+                },
                 "id": {
+                    "type": "string"
+                },
+                "index": {
                     "type": "string"
                 },
                 "language": {
@@ -823,6 +910,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "obscure": {
+                    "type": "string"
+                },
+                "title": {
                     "type": "string"
                 },
                 "uncompressedSize": {

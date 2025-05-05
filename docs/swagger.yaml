@@ -12,13 +12,19 @@ definitions:
         type: string
       difficulty:
         type: string
+      hivecraftVersion:
+        type: string
       id:
+        type: string
+      index:
         type: string
       language:
         type: string
       name:
         type: string
       obscure:
+        type: string
+      title:
         type: string
       uncompressedSize:
         type: integer
@@ -296,6 +302,59 @@ paths:
               type: string
             type: object
       summary: Generate puzzle input
+      tags:
+      - Puzzles
+  /puzzle/hotswap:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Replaces a puzzle with a new version keeping the same ID
+      parameters:
+      - description: Theme name
+        in: query
+        name: theme
+        required: true
+        type: string
+      - description: Puzzle ID to replace
+        in: query
+        name: puzzle_id
+        required: true
+        type: string
+      - description: New puzzle file (.alghive)
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Hot swap a puzzle
       tags:
       - Puzzles
   /puzzle/upload:

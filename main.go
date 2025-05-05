@@ -101,6 +101,7 @@ func main() {
 		// Puzzle management
 		protected.POST("/puzzle/upload", puzzleController.UploadPuzzle)
 		protected.DELETE("/puzzle", puzzleController.DeletePuzzle)
+		protected.POST("/puzzle/hotswap", puzzleController.HotSwapPuzzle)
 	}
 
 	

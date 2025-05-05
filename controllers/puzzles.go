@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"os"
 	"path/filepath"
 
 	"github.com/algohive/beeapi/models"
@@ -443,4 +444,78 @@ func (p *PuzzleController) CheckSecondSolution(c *gin.Context) {
     } else {
         c.JSON(http.StatusOK, gin.H{"matches": false})
     }
+}
+
+// HotSwapPuzzle godoc
+// @Summary Hot swap a puzzle
+// @Description Replaces a puzzle with a new version keeping the same ID
+// @Tags Puzzles
+// @Accept multipart/form-data
+// @Produce json
+// @Param theme query string true "Theme name"
+// @Param puzzle_id query string true "Puzzle ID to replace"
+// @Param file formData file true "New puzzle file (.alghive)"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /puzzle/hotswap [post]
+// @Security Bearer
+func (p *PuzzleController) HotSwapPuzzle(c *gin.Context) {
+	themeName := c.Query("theme")
+	puzzleID := c.Query("puzzle_id")
+	
+	// Validate theme exists
+	theme := p.loader.GetTheme(themeName)
+	if theme == nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Theme not found"})
+		return
+	}
+	
+	// Validate puzzle ID
+	var foundPuzzle bool
+	for _, puzzle := range theme.Puzzles {
+		if puzzle.GetId() == puzzleID {
+			foundPuzzle = true
+			break
+		}
+	}
+		
+	if !foundPuzzle {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Puzzle not found"})
+		return
+	}
+	
+	// Get file from form
+	file, err := c.FormFile("file")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "No file uploaded"})
+		return
+	}
+	
+	// Check file extension
+	if filepath.Ext(file.Filename) != ".alghive" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Only .alghive files are allowed"})
+		return
+	}
+	
+	// Save file to temporary location
+	tempFile := filepath.Join(os.TempDir(), file.Filename)
+	if err := c.SaveUploadedFile(file, tempFile); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save file"})
+		return
+	}
+	defer os.Remove(tempFile) // Clean up temporary file
+	
+	// Perform hot swap
+	if err := p.loader.HotSwap(themeName, puzzleID, tempFile); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to hot swap puzzle: " + err.Error()})
+		return
+	}
+	
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Puzzle hot swapped successfully",
+		"id": puzzleID,
+		"theme": themeName,
+	})
 }
